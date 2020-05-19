@@ -43,26 +43,58 @@ public class App {
         
         Caching caching = Caching.getInstance();
         System.out.println("caching name : " + caching.getCachingName());
+        
+        
+        /**
+         * 세 번재, 반환 타입의 하위 타입 객체를 반환할 수 있는 능력이 있다.
+         * 반환할 객체의 클래스를 자유롭게 선택할 수 있게 하는 '엄청난 유연성'을 선물한다.
+         */
+        Pizzaible pizza = Pizza.newPizzaInstance();
+        System.out.println("pizza name : " + pizza.getPizzaName());
+        
+        Pizzaible spinachPizza = Pizza.newSpinachPizzaInstance();
+        System.out.println("spinach pizza name : " + spinachPizza.getPizzaName());
+        
+        Pizzaible bulgogiPizza = Pizza.newBulgogiPizzaInstance();
+        System.out.println("bulgogi pizza name : " + bulgogiPizza.getPizzaName());
+        
+        
+        /**
+         * 네 번째, 입력 매개변수에 따라 매번 다른 클래스의 객체를 반환할 수 있다.
+         * 반환 타입의 하위 타입이기만 하면 어떤 클래스의 객체를 반환하든 상관없다.
+         * 심지어 다음 릴리스에서는 또 다른 클래스의 객체를 반환해도 된다.
+         * EnumSet 클래스(아이템 36)의 noneOf 메서드는 인수가 64개 이하면 RegularEnumSet의 인스턴스를
+         * 이상이면 JumboEnumSet의 인스턴스를 반환한다.
+         * 만약 다음 릴리스에서 RegularEnumSet의 사용 이점이 없어져 삭제하거나 다른 하위 타입으로 변경해도
+         * 클라이언트는 팩터리가 건네주는 객체가 어느 클래스의 인스턴스인지 알 수도 없고 알 필요도 없기 떄문 이다.
+         * 
+		    public static <E extends Enum<E>> EnumSet<E> noneOf(Class<E> elementType) {
+		        Enum<?>[] universe = getUniverse(elementType);
+		        if (universe == null)
+		            throw new ClassCastException(elementType + " not an enum");
+		
+		        if (universe.length <= 64)
+		            return new RegularEnumSet<>(elementType, universe);
+		        else
+		            return new JumboEnumSet<>(elementType, universe);
+		    }  
+         */
+        
     }
 }
 
-/**
- * 
- * @author sinnakeWEB
- *
- */
 class NameClass {
 	final private String name;	
 	
 	/**
-	 * 생성자를 protected를 함으로서 객체 생성은 정적 팩터리 메서드로만 할 수 있게 유도한다.
-	 * 단 생성자를 protected로 했기 때문에 상속이 불가능한 클래스가 된다.
+	 * 생성자를 private으로 함으로서 객체 생성은 정적 팩터리 메서드로만 할 수 있게 유도한다.
+	 * 단 생성자를 private로 했기 때문에 상속이 불가능한 클래스가 된다.
 	 */
-	protected NameClass() {
+	NameClass() {
 		this.name = "sinnake";
 	}
 	
-	protected NameClass(String name) {
+	NameClass(String name) {
 		this.name = name;
 	}
 	
@@ -101,22 +133,15 @@ class NameClass {
 	}
 }
 
-
-
-/**
- * 
- * @author sinnakeWEB
- *
- */
 class Caching {
 	final private String cachingName;
 	final private static Caching CACHING = new Caching("caching");
 	
-	protected Caching() {
+	Caching() {
 		this.cachingName = "not caching";
 	}
 	
-	protected Caching(String cachingName) {
+	Caching(String cachingName) {
 		this.cachingName = cachingName;
 	}
 	
@@ -140,3 +165,39 @@ class Caching {
 
 	public String getCachingName() { return cachingName; }
 }
+
+interface Pizzaible {
+	public String getPizzaName();
+}
+
+class Pizza implements Pizzaible {
+
+	Pizza() {}
+	
+	public String getPizzaName() {
+		return "pizza";
+	}
+	
+	public static Pizzaible newPizzaInstance() {
+		return new Pizza();
+	}
+	
+	public static Pizzaible newSpinachPizzaInstance() {
+		return new Pizzaible() {
+			
+			public String getPizzaName() {
+				return "spinachPizza";
+			}
+		};
+	}
+	
+	public static Pizzaible newBulgogiPizzaInstance() {
+		return new Pizzaible() {
+			
+			public String getPizzaName() {
+				return "bulgogiPizza";
+			}
+		};
+	}
+}
+
