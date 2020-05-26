@@ -1,9 +1,16 @@
 package com.item1;
 
+import com.item1.pizza.Pizza;
+import com.item1.pizza.interfaces.Pizzaible;
+
 /**
+ * <pre>
  * item1 생성자 대신 정적 팩터리 메서드를 고려하라.
+ * </pre>
+ * 
+ * @author sinnakeWEB
  */
-public class App {
+public class Item1Main {
     public static void main( String[] args ) {
     	
     	/**
@@ -60,13 +67,13 @@ public class App {
          * 
          * </pre>
          */
-        Pizzaible pizza = Pizza.newPizzaInstance();
+        Pizzaible pizza = Pizza.newInstance();
         System.out.println("pizza name : " + pizza.getPizzaName());
         
-        Pizzaible spinachPizza = Pizza.newSpinachPizzaInstance();
+        Pizzaible spinachPizza = Pizza.newSpinachPizza();
         System.out.println("spinach pizza name : " + spinachPizza.getPizzaName());
         
-        Pizzaible bulgogiPizza = Pizza.newBulgogiPizzaInstance();
+        Pizzaible bulgogiPizza = Pizza.newBulgogiPizza();
         System.out.println("bulgogi pizza name : " + bulgogiPizza.getPizzaName());
         
         
@@ -126,6 +133,7 @@ public class App {
          */
         
         /**
+         * <pre>
          * 단점
          * 
          * 첫 번째, 상속을 하려면 public이나 protected 생성자가 필요하니 정적 팩터리 메서드만 제공하면 하위 클래스를 만들 수 없다.
@@ -133,138 +141,36 @@ public class App {
          * 오히려 장점으로 받아들일 수도 있다.
          * 
          * 두 번째, 정적 팩터리 메서드는 프로그래머가 찾기 어렵다.
-         * 생성자처럼 API 설명에 명확히 드러나지 않으니 사용자는 정적 팩터리 메서드 방식 클래스를 인스턴스화할 방법을 알아내야 한다. 
+         * 생성자처럼 API 설명에 명확히 드러나지 않으니 사용자는 정적 팩터리 메서드 방식 클래스를 인스턴스화할 방법을 알아내야 한다.
+         * 메서드 이름을 널리 알려진 규약을 따라 짓는 식으로 문제를 완화해줘야 한다.
+         * 다음은 정적 팩터리 메서드에 흔히 사용하는 명명 방식들이다.
+         * 
+         * from : 매개변수를 하나 받아서 해당 타입의 인스턴스를 반환하는 형변환 메서드
+         * 예) Date d = Date.form(instant);
+         * 
+         * of : 여러 매개변수를 받아 적합한 타입의 인스턴스를 반환하는 집계 메서드
+         * 예) Set<Rank> faceCards = EnumSet.of(JACK, QUEEN, KING);
+         * 
+         * valueOf : from과 of의 더 자세한 버전
+         * 예) BigInteger prime = BigInteger.valueOf(Integer.MAX_VALUE);
+         * 
+         * instance 혹은 getInstance : (매개변수를 받는다면) 매개변수로 명시한 인스턴스를 반환하지만, 같은 인스턴스임을 보장하지는 않는다.
+         * 예) StackWalker luke = StackWalker.getInstance(options);
+         * 
+         * create 혹은 newInstance : instance 혹은 getInstance와 같지만, 매번 새로운 인스턴스를 생성해 반환함을 보장한다.
+         * 예) Object newArray = Array.newInstance(classObject, arrayLen);
+         * 
+         * getType : getInstance와 같으나, 생성할 클래스가 아닌 다른 클래스에 팩터리 메서드를 정의할 때 쓴다.
+         * "Type"은 팩터리 메서드가 반환할 객체의 타입이다.
+         * 예) FileStore fs = Files.getFileStore(path);
+         * 
+         * newType : newInstance와 같으나, 생성할 클래스가 아닌 다른 클래스에 팩터리 메서드를 정의할 때 쓴다.
+         * "Type"은 팩터리 메서드가 반환할 객체의 타입이다.
+         * 예) BufferedReader br = Files.newBufferedReader(path);
+         * 
+         * type : getType과 newType의 간결한 버전
+         * 예) List<Complaint> litany = Collections.list(legacyLitany);
+         * </pre>
          */
     }
 }
-
-class NameClass {
-	final private String name;	
-	
-	/**
-	 * <pre>
-	 * 생성자를 private으로 함으로서 객체 생성은 정적 팩터리 메서드로만 할 수 있게 유도한다.
-	 * 단 생성자를 private로 했기 때문에 상속이 불가능한 클래스가 된다.
-	 * </pre>
-	 */
-	NameClass() {
-		this.name = "sinnake";
-	}
-	
-	NameClass(String name) {
-		this.name = name;
-	}
-	
-	/**
-	 * <pre>
-	 * 기본 생성자 생성 정적 팩터리 매서드.
-	 * </pre>
-	 * 
-	 * @return 기본 생성자를 실행한 객체를 반환한다.
-	 */
-	public static NameClass newInstance() {
-		return new NameClass();
-	}
-	
-	/**
-	 * <pre>
-	 * NameClass(String name) 생성자 생성 정적 팩터리 메서드.
-	 * </pre>
-	 * 
-	 * @return default라고 값을 설정한 생성자를 반환한다.
-	 */
-	public static NameClass newDefaultNameInstance() {
-		return new NameClass("default");
-	}
-
-	/**
-	 * <pre>
-	 * NameClass(String name) 생성자 생성 정적 팩터리 메서드.
-	 * 
-	 * name를 매개변수로 받아 생성한다.
-	 * </pre>
-	 * 
-	 * @param name name을 설정할 이름 값.
-	 * @return 외부로부터 전달받은 name 값으로 생성한 생성자를 반환한다.
-	 */
-	public static NameClass newNameInstance(String name) {
-		return new NameClass(name);
-	}
-	
-	public String getName() {
-		return this.name;
-	}
-}
-
-class Caching {
-	final private String cachingName;
-	final private static Caching CACHING = new Caching("caching");
-	
-	Caching() {
-		this.cachingName = "not caching";
-	}
-	
-	Caching(String cachingName) {
-		this.cachingName = cachingName;
-	}
-	
-	/**
-	 * <pre>
-	 * 기본 생성자 정적 팩터리 메서드.
-	 * </pre>
-	 * 
-	 * @return 기본 생성자로 생성한 객체를 반환한다.
-	 */
-	public static Caching newInstance() {
-		return new Caching();
-	}
-	
-	/**
-	 * <pre>
-	 * 캐싱되어 있는 CACHING 객체를 반환하는 정적 팩터리 메서드.
-	 * </pre>
-	 * 
-	 * @return CACHING 객체를 반환한다.
-	 */
-	public static Caching getInstance() {
-		return CACHING;
-	}
-
-	public String getCachingName() { return cachingName; }
-}
-
-interface Pizzaible {
-	public String getPizzaName();
-}
-
-class Pizza implements Pizzaible {
-
-	Pizza() {}
-	
-	public String getPizzaName() {
-		return "pizza";
-	}
-	
-	public static Pizzaible newPizzaInstance() {
-		return new Pizza();
-	}
-	
-	public static Pizzaible newSpinachPizzaInstance() {
-		return new Pizzaible() {
-			
-			public String getPizzaName() {
-				return "spinachPizza";
-			}
-		};
-	}
-	
-	public static Pizzaible newBulgogiPizzaInstance() {
-		return new Pizzaible() {
-			
-			public String getPizzaName() {
-				return "bulgogiPizza";
-			}
-		};
-	}
-}
-
