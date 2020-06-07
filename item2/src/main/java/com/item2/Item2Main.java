@@ -1,11 +1,16 @@
 package com.item2;
 
+import com.item2.pattern.BuilderPattern;
 import com.item2.pattern.JavaBeansPattern;
 import com.item2.pattern.TelescopingConstructorPattern;
+import com.item2.pattern.builder.Calzone;
+import com.item2.pattern.builder.NyPizza;
+import com.item2.pattern.builder.NyPizza.Size;
+import com.item2.pattern.builder.Pizza.Topping;
 
 /**
  * <pre>
- * 생성자에 매개벼수가 많다면 빌더를 고려하라
+ * 생성자에 매개변수가 많다면 빌더를 고려하라
  * </pre>
  * 
  * @author sinnakeWEB
@@ -32,7 +37,7 @@ public class Item2Main {
     		 */
     		new TelescopingConstructorPattern(240, 8, 100, 0, 35, 27);
     	
-    	System.out.println(String.format("[TelescopingConstructorPattern]\n"
+    	System.out.println(String.format("\n[TelescopingConstructorPattern]\n"
     			+ "servingSize : %d\nservings : %d\ncalories : %d\nfat : %d\nsodium : %d\ncarbohydrate : %d"
 			, telescopingConstructorPattern.getServingSize()
 			, telescopingConstructorPattern.getServings()
@@ -68,7 +73,7 @@ public class Item2Main {
     	javaBeansPattern.setSodium(35);
     	javaBeansPattern.setCarbohydrate(27);
     	
-    	System.out.println(String.format("[JavaBeansPattern]\n"
+    	System.out.println(String.format("\n[JavaBeansPattern]\n"
     			+ "servingSize : %d\nservings : %d\ncalories : %d\nfat : %d\nsodium : %d\ncarbohydrate : %d"
 			, javaBeansPattern.getServingSize()
 			, javaBeansPattern.getServings()
@@ -93,5 +98,70 @@ public class Item2Main {
     	 * </pre>
     	 */
     	
+    	/**
+    	 * <pre>
+    	 * 위 2개의 패턴의 대안으로 점층적 생성자 패턴과 자바빈즈 패턴의 가독성을 겸비한 빌터 패턴이다.
+    	 * 		1. 클라이언트는 필요한 객체를 직접 만드는 대신, 필수 매개변수만으로 생성자(혹은 정적 팩터리)를 호출해 빌더 객체를 얻는다. 
+    	 * 		2. 그런 다음 빌더 객체가 제공하는 일종의 세터 메서드들로 원하는 선택 매개변수들을 설정한다.
+    	 * 		3. 마지막으로 매개변수가 없는 build 메서드를 호출해 드디어 우리에게 필요한(보통 불변인) 객체를 얻는다.
+    	 * 빌더는 생성할 클래스 안에 정적 멤버 클래스로 만들어두는게 보통이다.
+    	 * </pre>
+    	 */
+    	
+    	/**
+    	 * <pre>
+    	 * BuilderPattern 클래스는 불변이며, 모든 매개변수의 기본값들을 한곳에 모아뒀다.
+    	 * 빌더의 세터 메서드들은 빌더 자신을 반환하기 떄문에 연쇄적으로 호출할 수 있다.
+    	 * 이런 방식을 메서드 호출이 흐르듯 연결된다는 뜻으로 플루언트 API(fluent API) 혹은 메서드 연쇄(method chaining)라 한다.    	 
+    	 * </pre>
+    	 */
+    	BuilderPattern builderPattern = new BuilderPattern.Builder(240, 8)
+    		.calories(100).sodium(35).carbohydrate(27).build();
+    	
+    	System.out.println(String.format("\n[BuilderPattern]\n"
+    			+ "servingSize : %d\nservings : %d\ncalories : %d\nfat : %d\nsodium : %d\ncarbohydrate : %d"
+			, builderPattern.getServingSize()
+			, builderPattern.getServings()
+			, builderPattern.getCalories()
+			, builderPattern.getFat()
+			, builderPattern.getSodium()
+			, builderPattern.getCarbohydrate()));
+    	
+    	/**
+    	 * <pre>
+    	 * 빌더 패턴은 (파이썬과 스칼라에 있는) 명명된 선택적 매개변수(named optional parameters)를 흉내 낸 것이다.
+    	 * - 잘못된 매개변수를 최대한 일찍 발견하려면 빌더의 생성자와 메서드에서 입력 매개변수를 검사한다.
+    	 * - build 메서드가 호출하는 생성자에서 여러 매개변수에 걸친 불변식(invariant)을 검사한다.
+    	 * - 공격에 대비해 이런 불변식을 보장하려면 빌더로부터 매개변수를 복사한 후 해당 객체 필드들도 검사해야 한다.(아이템 50)
+    	 * - 검사해서 잘못된 점을 발견하면 어떤 매개변수가 잘못되었는지를 자세히 알려주는 메세지를 담아 IllegalArgumentException을 던지면 된다.(아이템 75)
+    	 * 
+    	 * 옮긴이
+    	 * 불변(immutalbe 혹은 immutability)은 어떤 변경도 허용하지 않는다는 뜻이다.
+    	 * 주로 변경을 허용하는 가변(mutalbe) 객체와 구분하는 용도로 쓰인다.
+    	 * 대표적으로 String 객체는 한번 만들어지면 절대 값을 바꿀 수 없는 불변 객체다.
+    	 * 한편, 불변식(invariant)은 프로그램이 실행되는 동안, 혹은 정해진 기간 동안 반드시 만족해야 하는 조건을 말한다.
+    	 * 다시 말해 변경을 허용할 수는 있으나 주어진 조건 내에서만 허용한다는 뜻이다.
+    	 * 예컨대 리스트의 크기는 반드시 0 이상이어야 하니, 만약 한순간이라도 음수 값이 된다면 불변식이 깨진 것이다.
+    	 * 또한, 기간을 표현하는 Period 클래스에서 start 필드의 값은 반드시 end필드의 값보다 앞서야 하므로, 두 값이 역전되면
+    	 * 역시 불변식이 깨진 것이다.(아이템 50 참조)
+    	 * 따라서 가변 객체에도 불변식은 존재할 수 있으며, 넓게 보면 불변은 불변식의 극단적인 예라 할 수 있다.
+    	 * </pre>
+    	 */
+    	
+    	NyPizza nyPizza = new NyPizza.Builder(Size.SMALL)
+    		.addTopping(Topping.SAUSAGE)
+    		.addTopping(Topping.ONION).build();
+    	
+    	System.out.println(String.format("\n[NyPizza BuilderPattern] NyPizzaSize : %s, PizzaToppings : %s"
+			, nyPizza.getNyPizzaSize()
+			, nyPizza.getPizzaToppings()));
+    	
+    	Calzone calzone = new Calzone.Builder()
+			.addTopping(Topping.HAM)
+			.sauceInside().build();
+    	
+    	System.out.println(String.format("\n[Calzone BuilderPattern] sauceInside : %s, PizzaToppings : %s"
+			, calzone.getCalzoneSauceInside()
+			, calzone.getPizzaToppings()));
     }
 }
