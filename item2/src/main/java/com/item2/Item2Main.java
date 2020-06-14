@@ -148,18 +148,51 @@ public class Item2Main {
     	 * </pre>
     	 */
     	
+    	/**
+    	 * <pre>
+    	 * 빌더 패턴은 계층적으로 설계된 클래스와 함께 쓰기에 좋다.
+    	 * 각 계층의 클래스에 관련 빌더를 멤버로 정의하자.
+    	 * 추상 클래스는 추상 빌더를, 구체 클래스(concrete class)는 구체 빌더를 갖게 한다.
+    	 * 
+    	 * 자세한 내용은 각 클래스에 작성된 주석을 참고.
+    	 * 
+    	 * 빌더 패턴은 상당히 유연하다. 
+    	 * 		- 빌더 하나로 여러 객체를 순회하면서 만들 수 있고,
+    	 * 		- 빌더에 넘기는 매개변수에 따라 다른 객체를 만들 수도 있다.
+    	 * 		- 객체마다 부여되는 일련번호와 같은 특정 필드는 빌더가 알아서 채우도록 할 수도 있다.
+    	 * 빌더 패턴에 장점만 있는 것은 아니다. 
+    	 * 		- 객체를 만들려면, 그에 앞서 빌더부터 만들어야 한다.
+    	 * 		- 빌더 생성 비용이 크지는 않지만 성능에 민감한 상황에서는 문제가 될 수 있다.
+    	 * 		- 또한 점층적 생성자 패턴보다는 코드가 장황해서 매개변수가 4개 이상은 되여야 값어치를 한다.
+    	 * 		하지만 API는 시간이 지날수록 매개변수가 많아지는 경향이 있음을 명심하자.
+    	 * 		- 생성자나 정적 팩터리 방식으로 시작했다가 나중에 매개변수가 많아지면 빌더 패턴으로 전환할 수도 있지만,
+    	 * 		이전에 만들어둔 생성자와 정적 팩터리가 도드라져 보일 것이다. 
+    	 * 		그러니 애초에 빌더로 시작하는 편이 나을 때가 많다.
+    	 * 
+    	 * 핵심정리
+    	 * 생성자나 정적 팩터리가 처리해야 할 매개변수가 많다면 빌더 패턴을 선택하는 겟 더 낫다.
+    	 * 매개변수 중 다수가 필수가 아니거나 같은 타입이면 특히 더 그렇다.
+    	 * 빌더는 점층적 생성자보다 클라이언트 코드를 읽고 쓰기가 훨씬 간결하고, 자바빈즈보다 훨씬 안전하다.
+    	 * </pre>
+    	 */
     	NyPizza nyPizza = new NyPizza.Builder(Size.SMALL)
+    		/**
+    		 * 생성자로는 누릴 수 없는 사소한 이점으로, 빌더를 이용하면 가변인수(varargs) 매개변수를 여러 개 사용할 수 있다.
+    		 * 각각을 적절한 메서드로 나눠 선언하면 된다. 
+    		 * 아니면 메서드를 여러 번 호출하도록 하고 각 호출 때 넘겨진 매개변수들을 하나의 필드로 모을 수도 있다.
+    		 * 아래 addTopping 메서드가 이렇게 구현한 예이다.
+    		 */
     		.addTopping(Topping.SAUSAGE)
     		.addTopping(Topping.ONION).build();
-    	
-    	System.out.println(String.format("\n[NyPizza BuilderPattern] NyPizzaSize : %s, PizzaToppings : %s"
-			, nyPizza.getNyPizzaSize()
-			, nyPizza.getPizzaToppings()));
-    	
+
     	Calzone calzone = new Calzone.Builder()
 			.addTopping(Topping.HAM)
 			.sauceInside().build();
-    	
+
+    	System.out.println(String.format("\n[NyPizza BuilderPattern] NyPizzaSize : %s, PizzaToppings : %s"
+			, nyPizza.getNyPizzaSize()
+			, nyPizza.getPizzaToppings()));
+
     	System.out.println(String.format("\n[Calzone BuilderPattern] sauceInside : %s, PizzaToppings : %s"
 			, calzone.getCalzoneSauceInside()
 			, calzone.getPizzaToppings()));
